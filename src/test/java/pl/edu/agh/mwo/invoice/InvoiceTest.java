@@ -1,5 +1,7 @@
 package pl.edu.agh.mwo.invoice;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.math.BigDecimal;
 
 import org.hamcrest.Matchers;
@@ -129,4 +131,38 @@ public class InvoiceTest {
         int number2 = new Invoice().getNumber();
         Assert.assertThat(number1, Matchers.lessThan(number2));
     }
+
+    @Test
+    public void testPrintInvoiceNotEmpty() {
+        PrintStream out = System.out;
+        ByteArrayOutputStream outStreamCaptor = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outStreamCaptor));
+        invoice.printInvoice();
+        String invoiceString = outStreamCaptor.toString().trim();
+        Assert.assertNotEquals(invoiceString, null);
+        System.setOut(out);
+    }
+
+    @Test
+    public void testAddDuplicateIncreaseQuantity() {
+        OtherProduct lupa = new OtherProduct("lupa", new BigDecimal("13.50"));
+        invoice.addProduct(lupa);
+        invoice.addProduct(lupa);
+        int quantity2 = invoice.getProducts().get(lupa);
+        invoice.addProduct(lupa);
+        int quantity3 = invoice.getProducts().get(lupa);
+        Assert.assertTrue(quantity3 - quantity2 == 1);
+    }
+
+    @Test
+    public void testAddManyDuplicates() {
+        OtherProduct lupa = new OtherProduct("lupa", new BigDecimal("13.50"));
+        invoice.addProduct(lupa);
+        int quantity1 = invoice.getProducts().get(lupa);
+        invoice.addProduct(lupa, 13);
+        int quantity2 = invoice.getProducts().get(lupa);
+        Assert.assertNotEquals(quantity2 - quantity1, quantity1);
+    }
+    
+    
 }

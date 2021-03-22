@@ -18,7 +18,11 @@ public class Invoice {
         if (product == null || quantity <= 0) {
             throw new IllegalArgumentException();
         }
-        products.put(product, quantity);
+        if (products.get(product) == null) {
+            products.put(product, quantity);
+        } else {
+            products.put(product, products.get(product) + quantity);
+        }
     }
 
     public BigDecimal getNetTotal() {
@@ -43,7 +47,23 @@ public class Invoice {
         return totalGross;
     }
 
+    public void printInvoice() {
+        System.out.println("Invoice number: " + this.getNumber());
+        for (Product product : products.keySet()) {
+            System.out.println("Product: " + product.getName() + "; quantity: " + products.get(product)
+                    + "; unit price: " + product.getPriceWithTax());
+        }
+
+        System.out.println("Number of items: " + products.size());
+
+    }
+
     public int getNumber() {
         return number;
     }
+
+    public Map<Product, Integer> getProducts() {
+        return products;
+    }
+
 }
